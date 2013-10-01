@@ -921,8 +921,12 @@ Handle<Value> MakeCallback(Environment* env,
   }
 
   if (has_async_queue) {
-    Local<Value> val = object.As<Value>();
-    env->async_listener_unload_function()->Call(process, 1, &val);
+    Local<Value> argv[] = {
+      object,
+      ret
+    };
+    env->async_listener_unload_function()->Call(
+        process, ARRAY_SIZE(argv), argv);
 
     if (try_catch.HasCaught())
       return Undefined(node_isolate);

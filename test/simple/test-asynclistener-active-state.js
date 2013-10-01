@@ -32,7 +32,8 @@ process.addAsyncListener(function() {
   before: function(context, domain) {
     active = domain.val;
   },
-  after: function(context, domain) {
+  after: function(context, domain, returnValue) {
+    assert.equal(active, returnValue);
     active = null;
   }
 });
@@ -42,13 +43,17 @@ process.nextTick(function() {
   assert.equal(active, 1);
   process.nextTick(function() {
     assert.equal(active, 3);
+    return 3;
   });
+  return 1;
 });
 
 
 process.nextTick(function() {
-    assert.equal(active, 2);
+  assert.equal(active, 2);
   process.nextTick(function() {
     assert.equal(active, 4);
+    return 4;
   });
+  return 2;
 });

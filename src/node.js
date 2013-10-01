@@ -350,7 +350,7 @@
 
     // Unload one level of the async stack. Returns true if there are
     // still listeners somewhere in the stack.
-    function unloadAsyncQueue(context) {
+    function unloadAsyncQueue(context, returnValue) {
       var item, after, i;
 
       // Run "after" callbacks.
@@ -361,7 +361,7 @@
           continue;
         after = item.callbacks.after;
         if (typeof after === 'function')
-          after(context, item.domain);
+          after(context, item.domain, returnValue);
       }
       inAsyncTick = false;
 
@@ -567,7 +567,7 @@
     // Run callbacks that have no domain.
     // Using domains will cause this to be overridden.
     function _tickCallback() {
-      var callback, hasQueue, threw, tock;
+      var callback, hasQueue, ret, threw, tock;
 
       while (tickInfo[kIndex] < tickInfo[kLength]) {
         tock = nextTickQueue[tickInfo[kIndex]++];
@@ -577,14 +577,14 @@
         if (hasQueue)
           _loadAsyncQueue(tock);
         try {
-          callback();
+          ret = callback();
           threw = false;
         } finally {
           if (threw)
             tickDone();
         }
         if (hasQueue)
-          _unloadAsyncQueue(tock);
+          _unloadAsyncQueue(tock, ret);
       }
 
       tickDone();
