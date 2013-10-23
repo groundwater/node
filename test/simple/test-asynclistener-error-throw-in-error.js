@@ -47,7 +47,7 @@ if (cluster.isMaster) {
     error: function () {
 
       // the error handler should not be called again
-      if(once++ === 0) process.exit(2);
+      if(once++ !== 0) process.exit(2);
 
       throw new Error('error handler');
     }
